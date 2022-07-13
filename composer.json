@@ -1,0 +1,28 @@
+{
+    "name": "kekos/prest-doc",
+    "description": "Static Site Generator for OpenAPI documentation",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christoffer Lindahl Hassel",
+            "email": "christoffer@kekos.se"
+        }
+    ],
+    "require": {
+        "php": "~8.0 || ~8.1",
+        "cebe/php-openapi": "^1.7",
+        "league/commonmark": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kekos\\PrestDoc\\": "src"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.8"
+    },
+    "scripts": {
+        "stan": "vendor/bin/phpstan analyze -l 9 src/"
+    }
+}
