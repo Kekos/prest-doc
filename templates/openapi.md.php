@@ -45,9 +45,9 @@ title: <?php echo $openapi->info->title; ?> v<?php echo $openapi->info->version 
 
 * [<?php echo $topic; ?>](#topic_<?php echo Utils::slugify($topic); ?>)
 <?php foreach ($paths as $path => $path_item): ?>
-<?php foreach ($path_item->getOperations() as $method => $operation): ?>
+<?php foreach ($path_item->getOperations() as $operation): ?>
 
-    * [<?php echo $operation->summary; ?>](#op_<?php echo Utils::slugify($operation->summary); ?>)
+    * [<?php echo $operation->summary; ?>](#op_<?php echo Utils::slugify($operation->operationId); ?>)
 <?php endforeach; ?>
 <?php endforeach; ?>
 <?php endforeach; ?>
@@ -135,7 +135,7 @@ OpenId Connect URL: *<?php echo $security_scheme->openIdConnectUrl; ?>*
 <?php foreach ($paths as $path => $path_item): ?>
 <?php foreach ($path_item->getOperations() as $method => $operation): ?>
 
-### <a id="op_<?php echo Utils::slugify($operation->summary); ?>"><?php echo $operation->summary; ?></a>
+### <a id="op_<?php echo Utils::slugify($operation->operationId); ?>"><?php echo $operation->summary; ?></a>
 
 `<?php echo strtoupper($method) .' ' . $path; ?>`
 
