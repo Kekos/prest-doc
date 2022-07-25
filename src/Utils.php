@@ -2,6 +2,11 @@
 
 namespace Kekos\PrestDoc;
 
+use cebe\openapi\spec\Reference;
+use cebe\openapi\spec\Schema;
+
+use stdClass;
+
 use function mb_strtolower;
 use function rawurlencode;
 use function str_replace;
@@ -17,5 +22,43 @@ final class Utils
         $str = str_replace([' ', '--'], '-', $str);
 
         return rawurlencode($str);
+    }
+
+    public static function getSchemaProperties(Schema|Reference $schema, bool $include_readonly = true): array
+    {
+        if ($schema instanceof Reference) {
+            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+            $schema = $schema->resolve();
+            if ($schema === null) {
+                return [];
+            }
+        }
+
+        $properties = [];
+
+        foreach ($schema->properties as $name => $property) {
+            if ($property->readOnly && !$include_readonly) {
+                continue;
+            }
+
+            if ($property->example !== null) {
+                $value = $property->example;
+            } elseif ($property->default !== null) {
+                $value = $property->default;
+            } else {
+                $value = match ($property->type) {
+                    'null' => null,
+                    'boolean' => true,
+                    'object' => new stdClass(),
+                    'array' => [],
+                    'number' => 1,
+                    default => 'string',
+                };
+            }
+
+            $properties[$name] = $value;
+        }
+
+        return $properties;
     }
 }

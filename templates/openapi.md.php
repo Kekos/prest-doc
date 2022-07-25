@@ -213,9 +213,16 @@ foreach ($auth_samples as $header => $example) {
 
 <?php echo $content->example; ?>
 
-<?php elseif ($content instanceof MediaType && $content->schema): ?>
+<?php elseif ($content instanceof MediaType && $content->schema):
+        $schema = $content->schema;
+        if ($schema instanceof Reference) {
+            $schema = $schema->resolve();
+        }
 
-schema
+        $include_readonly = ($method === 'GET');
+?>
+
+<?php echo json_encode(Utils::getSchemaProperties($schema, $include_readonly), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT); ?>
 
 <?php endif; ?>
 <?php endif; ?>
