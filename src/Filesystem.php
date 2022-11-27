@@ -29,8 +29,7 @@ final class Filesystem
         string $out_directory,
         string $from_ext,
         string $to_ext,
-    ): string
-    {
+    ): string {
         $relative = substr($file->getPathname(), strlen($in_directory) + 1);
 
         return sprintf(
@@ -79,11 +78,13 @@ final class Filesystem
 
         $rpos = strrpos($filename, $from_ext);
         if (!$rpos) {
-            throw new FilesystemException(sprintf(
-                'The extension "%s" could not be found in "%s"',
-                $from_ext,
-                $filename,
-            ));
+            throw new FilesystemException(
+                sprintf(
+                    'The extension "%s" could not be found in "%s"',
+                    $from_ext,
+                    $filename,
+                )
+            );
         }
 
         return substr($filename, 0, $rpos) . $to_ext;

@@ -29,10 +29,9 @@ final class MarkdownToHtmlStep implements BuildStep
     private CommonMarkConverter $converter;
 
     public function __construct(
-        private Filesystem $filesystem,
-        private AssetsRepository $assets,
-    )
-    {
+        private readonly Filesystem $filesystem,
+        private readonly AssetsRepository $assets,
+    ) {
         $this->converter = new CommonMarkConverter();
 
         $environment = $this->converter->getEnvironment();

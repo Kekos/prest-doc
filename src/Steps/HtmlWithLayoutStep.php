@@ -19,10 +19,9 @@ final class HtmlWithLayoutStep implements BuildStep
     private ?PhpTemplate $cached_template = null;
 
     public function __construct(
-        private Filesystem $filesystem,
-        private AssetsRepository $assets,
-    )
-    {
+        private readonly Filesystem $filesystem,
+        private readonly AssetsRepository $assets,
+    ) {
         $this->front_matter_parser = new FrontMatterParser(new SymfonyYamlFrontMatterParser());
     }
 

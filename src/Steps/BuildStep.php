@@ -8,5 +8,6 @@ use SplFileInfo;
 interface BuildStep
 {
     public function processInput(SplFileInfo $current, BuildContext $context): void;
+
     public function processOutput(SplFileInfo $current, BuildContext $context): void;
 }

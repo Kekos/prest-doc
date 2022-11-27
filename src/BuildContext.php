@@ -8,13 +8,13 @@ final class BuildContext
      * @param array<int, string>|string[] $exclude_paths
      */
     public function __construct(
-        private string $in_directory,
-        private string $out_directory,
-        private string $layout,
-        private string $openapi_template_directory,
-        private array $exclude_paths = [],
-    )
-    {}
+        private readonly string $in_directory,
+        private readonly string $out_directory,
+        private readonly string $layout,
+        private readonly string $openapi_template_directory,
+        private readonly array $exclude_paths = [],
+    ) {
+    }
 
     public function getInDirectory(): string
     {

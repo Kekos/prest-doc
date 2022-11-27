@@ -16,9 +16,9 @@ final class OpenApiToMarkdownStep implements BuildStep
     use CachesPhpTemplate;
 
     public function __construct(
-        private Filesystem $filesystem,
-    )
-    {}
+        private readonly Filesystem $filesystem,
+    ) {
+    }
 
     public function processInput(SplFileInfo $current, BuildContext $context): void
     {

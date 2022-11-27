@@ -20,17 +20,19 @@ final class ApiTaggedTopicsRepository
     public function add(PathItem $path_item, string $path): void
     {
         /** @var string[] $topics */
-        $topics = array_keys(array_reduce(
-            $path_item->getOperations(),
-            static function(array $carry, Operation $operation) {
-                if ($operation->tags) {
-                    $carry[$operation->tags[0]] = true;
-                }
+        $topics = array_keys(
+            array_reduce(
+                $path_item->getOperations(),
+                static function (array $carry, Operation $operation) {
+                    if ($operation->tags) {
+                        $carry[$operation->tags[0]] = true;
+                    }
 
-                return $carry;
-            },
-            [],
-        ));
+                    return $carry;
+                },
+                [],
+            )
+        );
 
         if (!($topic = current($topics))) {
             return;

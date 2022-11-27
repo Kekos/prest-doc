@@ -16,9 +16,9 @@ use const EXTR_OVERWRITE;
 final class PhpTemplate
 {
     public function __construct(
-        private string $filepath,
-    )
-    {}
+        private readonly string $filepath,
+    ) {
+    }
 
     /**
      * @param array<string, mixed> $variables
@@ -28,7 +28,7 @@ final class PhpTemplate
         ob_start();
 
         call_user_func(
-            function() use($variables) {
+            function () use ($variables) {
                 extract($variables, EXTR_OVERWRITE);
 
                 return require $this->filepath;
