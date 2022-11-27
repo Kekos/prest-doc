@@ -29,35 +29,36 @@ $auth_samples = [];
 title: <?php echo $openapi->info->title; ?> v<?php echo $openapi->info->version . PHP_EOL; ?>
 ---
 
-# <?php echo $openapi->info->title; ?> v<?php echo $openapi->info->version; ?>
-
+<div class="prest-doc-topics-menu">
 <?php if ($topics_menu): ?>
-<nav>
-<?php if ($openapi->components->securitySchemes): ?>
+    <nav>
 
+<?php if ($openapi->components->securitySchemes): ?>
 * [Authentication](#authentication)
 <?php endif; ?>
 <?php if ($openapi->components->headers): ?>
-
 * [Headers](#headers)
 <?php endif; ?>
 <?php foreach ($topics_menu as $topic => $paths): ?>
-
 * [<?php echo $topic; ?>](#topic_<?php echo Utils::slugify($topic); ?>)
 <?php foreach ($paths as $path => $path_item): ?>
 <?php foreach ($path_item->getOperations() as $operation): ?>
-
     * [<?php echo $operation->summary; ?>](#op_<?php echo Utils::slugify($operation->operationId); ?>)
 <?php endforeach; ?>
 <?php endforeach; ?>
 <?php endforeach; ?>
 * [Schemas](#schemas)
 <?php foreach ($openapi->components->schemas as $name => $schema): ?>
-
     * [<?php echo $name; ?>](#schema_<?php echo Utils::slugify($name); ?>)
 <?php endforeach; ?>
-</nav>
+
+    </nav>
 <?php endif; ?>
+</div>
+
+<div class="prest-doc-content">
+
+# <?php echo $openapi->info->title; ?> v<?php echo $openapi->info->version; ?>
 
 <?php if ($openapi->components->securitySchemes): ?>
 
@@ -231,7 +232,10 @@ foreach ($auth_samples as $header => $example) {
 </div>
 
 <?php if ($operation->parameters || $operation->requestBody instanceof RequestBody): ?>
+
 **Parameters**
+
+<div class="prest-doc-table prest-doc-parameters-table">
 
 | Name | In | Type | Required | Description |
 | ---- | -- | ---- | -------- | ----------- |
@@ -319,8 +323,12 @@ foreach ($auth_samples as $header => $example) {
 <?php endif; ?>
 <?php endif; ?>
 
+</div>
+
 <?php if ($operation->responses): ?>
 **Responses**
+
+<div class="prest-doc-table prest-doc-responses-table">
 
 | Status | Description | Schema |
 | ------ | ----------- | ------ |
@@ -366,6 +374,8 @@ foreach ($auth_samples as $header => $example) {
 ?> |
 <?php endforeach; ?>
 
+</div>
+
 <?php endif; ?>
 
 **Example responses**
@@ -403,6 +413,8 @@ foreach ($auth_samples as $header => $example) {
 ### <a id="schema_<?php echo Utils::slugify($name); ?>"><?php echo $name; ?></a>
 
 **Properties**
+
+<div class="prest-doc-table prest-doc-propertes-table">
 
 | Name | Type | Required | Restrictions | Description |
 | ---- | ---- | -------- | ------------ | ----------- |
@@ -455,6 +467,10 @@ foreach ($auth_samples as $header => $example) {
 ?> |
 <?php endforeach; ?>
 
+</div>
+
 <?php endforeach; ?>
 
 [Go to top](#top)
+
+</div>
