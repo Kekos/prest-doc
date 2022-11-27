@@ -28,9 +28,9 @@ final class Builder
         $this->filesystem = new Filesystem();
 
         $this->steps[] = new OpenApiToMarkdownStep($this->filesystem);
-        $this->steps[] = new MarkdownToHtmlStep($this->filesystem, $assets);
         $this->steps[] = new HtmlWithLayoutStep($this->filesystem, $assets);
-         $this->steps[] = new CopyStaticStep($this->filesystem);
+        $this->steps[] = new MarkdownToHtmlStep($this->filesystem, $assets);
+        $this->steps[] = new CopyStaticStep($this->filesystem);
     }
 
     public function build(BuildContext $context): void

@@ -11,6 +11,7 @@ use League\CommonMark\Extension\FrontMatter\Data\SymfonyYamlFrontMatterParser;
 use League\CommonMark\Extension\FrontMatter\FrontMatterParser;
 use SplFileInfo;
 
+use function dirname;
 use function is_file;
 
 final class HtmlWithLayoutStep implements BuildStep
@@ -27,13 +28,17 @@ final class HtmlWithLayoutStep implements BuildStep
 
     public function processInput(SplFileInfo $current, BuildContext $context): void
     {
-    }
-
-    public function processOutput(SplFileInfo $current, BuildContext $context): void
-    {
         if ($current->getExtension() !== 'html') {
             return;
         }
+
+        $output_filepath = $this->filesystem->getOutputPathFromInput(
+            file: $current,
+            in_directory: $context->getInDirectory(),
+            out_directory: $context->getOutDirectory(),
+            from_ext: 'html',
+            to_ext: 'html',
+        );
 
         $layout_template = $this->getLayoutTemplate($context);
         $html_content = $this->filesystem->getFileContents($current->getRealPath());
@@ -46,10 +51,15 @@ final class HtmlWithLayoutStep implements BuildStep
             'content' => $result->getContent(),
         ]);
 
+        $this->filesystem->makeDirectory(dirname($output_filepath));
         $this->filesystem->putFileContents(
-            $current->getRealPath(),
+            $output_filepath,
             $output,
         );
+    }
+
+    public function processOutput(SplFileInfo $current, BuildContext $context): void
+    {
     }
 
     private function getLayoutTemplate(BuildContext $context): PhpTemplate
