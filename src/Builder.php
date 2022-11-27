@@ -5,6 +5,7 @@ namespace Kekos\PrestDoc;
 use FilesystemIterator;
 use Kekos\PrestDoc\Exceptions\FaultyContextException;
 use Kekos\PrestDoc\Steps\BuildStep;
+use Kekos\PrestDoc\Steps\CopyStaticStep;
 use Kekos\PrestDoc\Steps\HtmlWithLayoutStep;
 use Kekos\PrestDoc\Steps\MarkdownToHtmlStep;
 use Kekos\PrestDoc\Steps\OpenApiToMarkdownStep;
@@ -29,6 +30,7 @@ final class Builder
         $this->steps[] = new OpenApiToMarkdownStep($this->filesystem);
         $this->steps[] = new MarkdownToHtmlStep($this->filesystem, $assets);
         $this->steps[] = new HtmlWithLayoutStep($this->filesystem, $assets);
+         $this->steps[] = new CopyStaticStep($this->filesystem);
     }
 
     public function build(BuildContext $context): void

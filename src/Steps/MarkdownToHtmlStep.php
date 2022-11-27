@@ -43,17 +43,17 @@ final class MarkdownToHtmlStep implements BuildStep
 
     public function processInput(SplFileInfo $current, BuildContext $context): void
     {
-        $this->process($current, $context);
+        $this->process($current, $context, $context->getInDirectory());
     }
 
     public function processOutput(SplFileInfo $current, BuildContext $context): void
     {
-        if ($this->process($current, $context)) {
+        if ($this->process($current, $context, $context->getOutDirectory())) {
             $this->filesystem->removeFile($current);
         }
     }
 
-    private function process(SplFileInfo $current, BuildContext $context): bool
+    private function process(SplFileInfo $current, BuildContext $context, string $relative_dir): bool
     {
         if ($current->getExtension() !== 'md') {
             return false;
@@ -68,7 +68,7 @@ final class MarkdownToHtmlStep implements BuildStep
 
         $output_filepath = $this->filesystem->getOutputPathFromInput(
             file: $current,
-            in_directory: $context->getInDirectory(),
+            in_directory: $relative_dir,
             out_directory: $context->getOutDirectory(),
             from_ext: 'md',
             to_ext: 'html',

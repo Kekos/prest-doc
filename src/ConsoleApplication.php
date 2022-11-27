@@ -5,7 +5,9 @@ namespace Kekos\PrestDoc;
 use Throwable;
 
 use function dirname;
+use function getcwd;
 use function printf;
+use function str_starts_with;
 
 final class ConsoleApplication
 {
@@ -18,6 +20,14 @@ final class ConsoleApplication
     {
         if (!isset($arguments[1], $arguments[2], $arguments[3])) {
             return $this->usage();
+        }
+
+        $arguments[1] = $this->makeAbsolutePath($arguments[1]);
+        $arguments[2] = $this->makeAbsolutePath($arguments[2]);
+        $arguments[3] = $this->makeAbsolutePath($arguments[3]);
+
+        if (isset($arguments[4])) {
+            $arguments[4] = $this->makeAbsolutePath($arguments[4]);
         }
 
         $builder = new Builder();
@@ -37,6 +47,15 @@ final class ConsoleApplication
         }
 
         return 0;
+    }
+
+    private function makeAbsolutePath(string $path): string
+    {
+        if (str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return getcwd() . '/' . $path;
     }
 
     private function usage(): int

@@ -16,6 +16,7 @@ use function ltrim;
 use function mkdir;
 use function rmdir;
 use function sprintf;
+use function str_starts_with;
 use function strlen;
 use function strrpos;
 use function substr;
@@ -23,6 +24,15 @@ use function unlink;
 
 final class Filesystem
 {
+    public function getRelativePath(SplFileInfo $file, string $directory): string
+    {
+        if (!str_starts_with($file->getRealPath(), $directory)) {
+            return $file->getRealPath();
+        }
+
+        return substr($file->getRealPath(), strlen($directory) + 1);
+    }
+
     public function getOutputPathFromInput(
         SplFileInfo $file,
         string $in_directory,
@@ -30,12 +40,20 @@ final class Filesystem
         string $from_ext,
         string $to_ext,
     ): string {
-        $relative = substr($file->getPathname(), strlen($in_directory) + 1);
+        $relative = dirname($this->getRelativePath($file, $in_directory));
+
+        if ($relative === '.') {
+            $relative = '';
+        }
+
+        if ($relative !== '') {
+            $relative .= '/';
+        }
 
         return sprintf(
-            '%s/%s/%s',
+            '%s/%s%s',
             $out_directory,
-            dirname($relative),
+            $relative,
             $this->changeExtension($file->getFilename(), $from_ext, $to_ext),
         );
     }

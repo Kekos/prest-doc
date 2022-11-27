@@ -16,6 +16,16 @@ final class FaultyContextException extends BaseException
         );
     }
 
+    public static function forPath(string $path): self
+    {
+        return new self(
+            sprintf(
+                'The path "%s" was not found',
+                $path,
+            )
+        );
+    }
+
     public static function forTemplate(string $path): self
     {
         return new self(
