@@ -2,6 +2,7 @@
 
 namespace Kekos\PrestDoc;
 
+use cebe\openapi\exceptions\UnresolvableReferenceException;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 
@@ -13,7 +14,9 @@ use function str_replace;
 
 final class Utils
 {
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function slugify(string $str): string
     {
@@ -24,7 +27,11 @@ final class Utils
         return rawurlencode($str);
     }
 
-    public static function getSchemaProperties(Schema|Reference $schema, bool $include_readonly = true): array
+    /**
+     * @return array<string, Reference|Schema>
+     * @throws UnresolvableReferenceException
+     */
+    public static function resolveSchemaProperties(Schema|Reference $schema): array
     {
         if ($schema instanceof Reference) {
             /** @noinspection CallableParameterUseCaseInTypeContextInspection */
@@ -55,6 +62,15 @@ final class Utils
             }
         }
 
+        return $properties;
+    }
+
+    /**
+     * @param array<string, Reference|Schema> $properties
+     * @return array<string, mixed>
+     */
+    public static function getSchemaExampleData(array $properties, bool $include_readonly = true): array
+    {
         $json_properties = [];
 
         foreach ($properties as $name => $property) {

@@ -215,15 +215,15 @@ foreach ($auth_samples as $header => $example) {
 <?php echo $content->example; ?>
 
 <?php elseif ($content instanceof MediaType && $content->schema):
-        $schema = $content->schema;
-        if ($schema instanceof Reference) {
-            $schema = $schema->resolve();
-        }
-
         $include_readonly = ($method === 'GET');
 ?>
 
-<?php echo json_encode(Utils::getSchemaProperties($schema, $include_readonly), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES); ?>
+<?php
+        echo json_encode(
+            Utils::getSchemaExampleData(Utils::resolveSchemaProperties($content->schema), $include_readonly),
+            JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+        );
+?>
 
 <?php endif; ?>
 <?php endif; ?>
@@ -388,26 +388,7 @@ foreach ($auth_samples as $header => $example) {
 ## <span id="schemas">Schemas</span>
 
 <?php foreach ($openapi->components->schemas as $name => $schema):
-        /** @var array<string, Reference|Schema> $properties */
-        $properties = [];
-
-        foreach ($schema->properties as $property_name => $property) {
-            $properties[$property_name] = $property;
-        }
-
-        if ($schema->allOf) {
-            foreach ($schema->allOf as $all_of_ref) {
-                if ($all_of_ref instanceof Reference) {
-                    $all_of_ref = $all_of_ref->resolve();
-                }
-
-                if ($all_of_ref instanceof Schema) {
-                    foreach ($all_of_ref->properties as $property_name => $property) {
-                        $properties[$property_name] = $property;
-                    }
-                }
-            }
-        }
+        $properties = Utils::resolveSchemaProperties($schema);
 ?>
 
 ### <a id="schema_<?php echo Utils::slugify($name); ?>"><?php echo $name; ?></a>
@@ -415,7 +396,12 @@ foreach ($auth_samples as $header => $example) {
 <div class="prest-doc-code-sample">
 
 ```json
-<?php echo json_encode(Utils::getSchemaProperties($schema), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES); ?>
+<?php
+        echo json_encode(
+            Utils::getSchemaExampleData($properties),
+            JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+        );
+?>
 
 ```
 </div>
