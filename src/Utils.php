@@ -34,9 +34,30 @@ final class Utils
             }
         }
 
+        /** @var array<string, Reference|Schema> $properties */
         $properties = [];
 
-        foreach ($schema->properties as $name => $property) {
+        foreach ($schema->properties as $property_name => $property) {
+            $properties[$property_name] = $property;
+        }
+
+        if ($schema->allOf) {
+            foreach ($schema->allOf as $all_of_ref) {
+                if ($all_of_ref instanceof Reference) {
+                    $all_of_ref = $all_of_ref->resolve();
+                }
+
+                if ($all_of_ref instanceof Schema) {
+                    foreach ($all_of_ref->properties as $property_name => $property) {
+                        $properties[$property_name] = $property;
+                    }
+                }
+            }
+        }
+
+        $json_properties = [];
+
+        foreach ($properties as $name => $property) {
             if ($property->readOnly && !$include_readonly) {
                 continue;
             }
@@ -56,9 +77,9 @@ final class Utils
                 };
             }
 
-            $properties[$name] = $value;
+            $json_properties[$name] = $value;
         }
 
-        return $properties;
+        return $json_properties;
     }
 }

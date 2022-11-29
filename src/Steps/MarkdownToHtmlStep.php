@@ -24,6 +24,7 @@ final class MarkdownToHtmlStep implements BuildStep
 
     private const HIGHLIGHT_LANGUAGES = [
         'http',
+        'json',
     ];
 
     private CommonMarkConverter $converter;

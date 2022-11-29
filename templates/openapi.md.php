@@ -223,7 +223,7 @@ foreach ($auth_samples as $header => $example) {
         $include_readonly = ($method === 'GET');
 ?>
 
-<?php echo json_encode(Utils::getSchemaProperties($schema, $include_readonly), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT); ?>
+<?php echo json_encode(Utils::getSchemaProperties($schema, $include_readonly), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES); ?>
 
 <?php endif; ?>
 <?php endif; ?>
@@ -411,6 +411,14 @@ foreach ($auth_samples as $header => $example) {
 ?>
 
 ### <a id="schema_<?php echo Utils::slugify($name); ?>"><?php echo $name; ?></a>
+
+<div class="prest-doc-code-sample">
+
+```json
+<?php echo json_encode(Utils::getSchemaProperties($schema), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES); ?>
+
+```
+</div>
 
 **Properties**
 
