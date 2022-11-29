@@ -331,6 +331,33 @@ foreach ($auth_samples as $header => $example) {
 
 **Example responses**
 
+<?php foreach ($operation->responses as $status => $response): ?>
+<?php foreach ($response->content as $content): ?>
+
+<?php echo $status; ?> response
+
+```json
+<?php
+        $schema = $content->schema;
+        if ($schema instanceof Schema && $schema->type === 'array') {
+            $response_example = [
+                Utils::getSchemaExampleData(Utils::resolveSchemaProperties($schema->items))
+            ];
+        } else {
+            $response_example = Utils::getSchemaExampleData(Utils::resolveSchemaProperties($schema));
+        }
+
+        echo json_encode(
+            $response_example,
+            JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+        );
+?>
+
+```
+
+<?php endforeach; ?>
+<?php endforeach; ?>
+
 </div>
 
 **Responses**
