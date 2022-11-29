@@ -140,12 +140,6 @@ OpenId Connect URL: *<?php echo $security_scheme->openIdConnectUrl; ?>*
 
 `<?php echo strtoupper($method) .' ' . $path; ?>`
 
-<?php if ($operation->deprecated): ?>
-**DEPRECATED**
-<?php endif; ?>
-
-<?php echo $operation->description; ?>
-
 <div class="prest-doc-code-sample">
 
 **Code samples**
@@ -230,6 +224,12 @@ foreach ($auth_samples as $header => $example) {
 ```
 <?php endforeach; ?>
 </div>
+
+<?php if ($operation->deprecated): ?>
+**DEPRECATED**
+<?php endif; ?>
+
+<?php echo $operation->description; ?>
 
 <?php if ($operation->parameters || $operation->requestBody instanceof RequestBody): ?>
 
@@ -326,6 +326,13 @@ foreach ($auth_samples as $header => $example) {
 </div>
 
 <?php if ($operation->responses): ?>
+
+<div class="prest-doc-code-sample">
+
+**Example responses**
+
+</div>
+
 **Responses**
 
 <div class="prest-doc-table prest-doc-responses-table">
@@ -377,8 +384,6 @@ foreach ($auth_samples as $header => $example) {
 </div>
 
 <?php endif; ?>
-
-**Example responses**
 
 <?php endforeach; ?>
 <?php endforeach; ?>
