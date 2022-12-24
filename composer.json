@@ -3,6 +3,13 @@
     "description": "Static Site Generator for OpenAPI documentation",
     "type": "project",
     "license": "MIT",
+    "keywords": [
+        "openapi",
+        "openapi documentation",
+        "static site generator",
+        "rest",
+        "api"
+    ],
     "authors": [
         {
             "name": "Christoffer Lindahl Hassel",
