@@ -64,8 +64,8 @@ title: <?php echo $openapi->info->title; ?> v<?php echo $openapi->info->version 
 
 ## <span id="authentication">Authentication</span>
 
-<?php foreach ($openapi->components->securitySchemes as $security_scheme): ?>
-### <?php echo $security_scheme->name; ?>
+<?php foreach ($openapi->components->securitySchemes as $security_name => $security_scheme): ?>
+### <span id="authentication_<?php echo $security_name; ?>"><?php echo $security_scheme->name; ?></span>
 
 <?php
 switch ($security_scheme->type) {
@@ -408,6 +408,41 @@ foreach ($auth_samples as $header => $example) {
 ?> |
 <?php endforeach; ?>
 
+<?php if (is_array($operation->security)): ?>
+
+**Authentication required**
+
+<?php
+    $one_of_required_security = [];
+    foreach ($operation->security as $security_requirement) {
+        $all_of_required_security = [];
+        // All schemes in this loop are "OR"
+        foreach ($openapi->components->securitySchemes as $security_name => $security_scheme) {
+            // All schemes in this loop are "AND"
+            if (isset($security_requirement->$security_name)) {
+                $all_of_required_security[$security_name] = $security_scheme;
+            }
+        }
+
+        $one_of_required_security[] = $all_of_required_security;
+    }
+
+    $first_or = true;
+    $last_one_of_key = array_key_last($one_of_required_security);
+    foreach ($one_of_required_security as $one_of_key => $all_of_schemes) {
+        if (!$first_or && $last_one_of_key === $one_of_key) {
+            printf("\n\n*...or...*\n\n");
+        }
+
+        foreach ($all_of_schemes as $security_name => $security_scheme) {
+            printf("* <a href=\"#authentication_%s\">%s</a>\n", $security_name, $security_scheme->name);
+        }
+
+        $first_or = false;
+    }
+?>
+<?php endif; ?>
+
 </div>
 
 <?php endif; ?>
@@ -437,6 +472,8 @@ foreach ($auth_samples as $header => $example) {
 
 ```
 </div>
+
+<?php echo $schema->description . PHP_EOL; ?>
 
 **Properties**
 

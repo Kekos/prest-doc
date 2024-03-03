@@ -8,6 +8,7 @@ use cebe\openapi\spec\Schema;
 
 use stdClass;
 
+use function current;
 use function mb_strtolower;
 use function rawurlencode;
 use function str_replace;
@@ -36,7 +37,7 @@ final class Utils
         if ($schema instanceof Reference) {
             /** @noinspection CallableParameterUseCaseInTypeContextInspection */
             $schema = $schema->resolve();
-            if ($schema === null) {
+            if (!$schema instanceof Schema) {
                 return [];
             }
         }
@@ -74,6 +75,10 @@ final class Utils
         $json_properties = [];
 
         foreach ($properties as $name => $property) {
+            if ($property instanceof Reference) {
+                continue;
+            }
+
             if ($property->readOnly && !$include_readonly) {
                 continue;
             }
@@ -82,11 +87,15 @@ final class Utils
                 $value = $property->example;
             } elseif ($property->default !== null) {
                 $value = $property->default;
+            } elseif ($property->enum) {
+                $value = current($property->enum);
+            } elseif ($property->items && $property->type === 'array') {
+                $value = [self::getSchemaExampleData(self::resolveSchemaProperties($property->items), $include_readonly)];
             } else {
                 $value = match ($property->type) {
                     'null' => null,
                     'boolean' => true,
-                    'object' => new stdClass(),
+                    'object' => self::getSchemaExampleData(self::resolveSchemaProperties($property), $include_readonly),
                     'array' => [],
                     'number' => 1,
                     default => 'string',
