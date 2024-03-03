@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Kekos\PrestDoc;
+namespace Kekos\PrestDoc\ApiEntities;
 
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
-
 use Kekos\PrestDoc\Exceptions\TopicException;
 
 use function array_keys;
@@ -12,12 +11,12 @@ use function array_reduce;
 use function count;
 use function current;
 
-final class ApiTaggedTopicsRepository
+final class TaggedTopicsRepository implements TopicsRepository
 {
     /** @var array<string, array<string, PathItem>> */
     private array $topics = [];
 
-    public function add(PathItem $path_item, string $path): void
+    public function addPath(PathItem $path_item, string $path): void
     {
         /** @var string[] $topics */
         $topics = array_keys(
@@ -45,11 +44,14 @@ final class ApiTaggedTopicsRepository
         $this->topics[$topic][$path] = $path_item;
     }
 
-    /**
-     * @return array<string, array<string, PathItem>>
-     */
-    public function getTopics(): array
+    public function getTopics(): TopicsCollection
     {
-        return $this->topics;
+        $topics = [];
+
+        foreach ($this->topics as $topic => $path_items) {
+            $topics[] = new TopicGroup($topic, $path_items);
+        }
+
+        return new TopicsCollection($topics);
     }
 }
