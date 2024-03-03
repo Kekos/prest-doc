@@ -32,9 +32,6 @@
     "require-dev": {
         "phpstan/phpstan": "^1.8"
     },
-    "replace": {
-        "symfony/polyfill-php80": "*"
-    },
     "scripts": {
         "stan": "vendor/bin/phpstan analyze -l 9 src/"
     }
