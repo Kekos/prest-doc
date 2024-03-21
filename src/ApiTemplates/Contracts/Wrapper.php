@@ -6,5 +6,5 @@ use cebe\openapi\spec\OpenApi;
 
 interface Wrapper
 {
-    public function getWrapper(OpenApi $open_api, string $content): string;
+    public function renderWrapper(OpenApi $open_api, string $content): string;
 }

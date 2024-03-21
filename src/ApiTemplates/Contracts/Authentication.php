@@ -6,5 +6,5 @@ use cebe\openapi\spec\OpenApi;
 
 interface Authentication
 {
-    public function getAuthentication(OpenApi $open_api): string;
+    public function renderAuthentication(OpenApi $open_api): string;
 }

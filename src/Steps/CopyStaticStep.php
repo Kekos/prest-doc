@@ -22,15 +22,15 @@ final class CopyStaticStep implements BuildStep
 
     public function processInput(SplFileInfo $current, BuildContext $context): void
     {
-        $relative = $this->filesystem->getRelativePath($current, $context->getInDirectory());
+        $relative = $this->filesystem->getRelativePath($current, $context->in_directory);
         if (!str_starts_with($relative, 'static/')) {
             return;
         }
 
         $destination_path = $this->filesystem->getOutputPathFromInput(
             file: $current,
-            in_directory: $context->getInDirectory(),
-            out_directory: $context->getOutDirectory(),
+            in_directory: $context->in_directory,
+            out_directory: $context->out_directory,
             from_ext: $current->getExtension(),
             to_ext: $current->getExtension(),
         );

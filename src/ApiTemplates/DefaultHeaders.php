@@ -7,7 +7,7 @@ use Kekos\PrestDoc\ApiTemplates\Contracts\Headers;
 
 final class DefaultHeaders implements Headers
 {
-    public function getHeaders(OpenApi $open_api): string
+    public function renderHeaders(OpenApi $open_api): string
     {
         if (!$open_api->components->headers) {
             return '';

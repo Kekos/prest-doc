@@ -6,5 +6,5 @@ use cebe\openapi\spec\OpenApi;
 
 interface Headers
 {
-    public function getHeaders(OpenApi $open_api): string;
+    public function renderHeaders(OpenApi $open_api): string;
 }

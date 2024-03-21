@@ -33,7 +33,7 @@ use const PHP_URL_HOST;
 
 final class DefaultOperations implements Contracts\Operations
 {
-    public function getOperations(OpenApi $open_api, TopicsCollection $topics): string
+    public function renderOperations(OpenApi $open_api, TopicsCollection $topics): string
     {
         $server_url = array_reduce(
             $open_api->servers,

@@ -35,12 +35,12 @@ final class Builder
 
     public function build(BuildContext $context): void
     {
-        if (!is_dir($context->getInDirectory())) {
-            throw FaultyContextException::forInputDirectory($context->getInDirectory());
+        if (!is_dir($context->in_directory)) {
+            throw FaultyContextException::forInputDirectory($context->in_directory);
         }
 
-        if (is_dir($context->getOutDirectory())) {
-            $this->cleanOutputDirectory($context->getOutDirectory());
+        if (is_dir($context->out_directory)) {
+            $this->cleanOutputDirectory($context->out_directory);
         }
 
         $this->runForInput($context);
@@ -65,7 +65,7 @@ final class Builder
 
     private function runForInput(BuildContext $context): void
     {
-        $iterator = $this->getIterator($context->getInDirectory());
+        $iterator = $this->getIterator($context->in_directory);
 
         foreach ($this->steps as $step) {
             /** @var SplFileInfo $file */
@@ -81,7 +81,7 @@ final class Builder
 
     private function runForOutput(BuildContext $context): void
     {
-        $iterator = $this->getIterator($context->getOutDirectory());
+        $iterator = $this->getIterator($context->out_directory);
 
         foreach ($this->steps as $step) {
             /** @var SplFileInfo $file */

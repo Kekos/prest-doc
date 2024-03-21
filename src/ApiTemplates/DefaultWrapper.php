@@ -7,7 +7,7 @@ use Kekos\PrestDoc\ApiTemplates\Contracts\Wrapper;
 
 final class DefaultWrapper implements Contracts\Wrapper
 {
-    public function getWrapper(OpenApi $open_api, string $content): string
+    public function renderWrapper(OpenApi $open_api, string $content): string
     {
         $title = $open_api->info->title;
         $version = $open_api->info->version;

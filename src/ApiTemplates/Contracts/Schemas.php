@@ -6,5 +6,5 @@ use cebe\openapi\spec\OpenApi;
 
 interface Schemas
 {
-    public function getSchemas(OpenApi $open_api): string;
+    public function renderSchemas(OpenApi $open_api): string;
 }

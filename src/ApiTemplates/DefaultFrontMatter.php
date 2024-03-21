@@ -7,7 +7,7 @@ use Kekos\PrestDoc\ApiTemplates\Contracts\FrontMatter;
 
 final class DefaultFrontMatter implements FrontMatter
 {
-    public function getFrontMatter(OpenApi $open_api): string
+    public function renderFrontMatter(OpenApi $open_api): string
     {
         $title = $open_api->info->title;
         $version = $open_api->info->version;

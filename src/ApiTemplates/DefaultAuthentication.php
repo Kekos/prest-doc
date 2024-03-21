@@ -9,7 +9,7 @@ use const PHP_EOL;
 
 final class DefaultAuthentication implements Contracts\Authentication
 {
-    public function getAuthentication(OpenApi $open_api): string
+    public function renderAuthentication(OpenApi $open_api): string
     {
         if (!$open_api->components->securitySchemes) {
             return '';

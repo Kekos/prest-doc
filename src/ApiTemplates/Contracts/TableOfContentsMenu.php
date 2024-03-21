@@ -7,5 +7,5 @@ use Kekos\PrestDoc\ApiEntities\TopicsCollection;
 
 interface TableOfContentsMenu
 {
-    public function getTableOfContentsMenu(OpenApi $open_api, TopicsCollection $topics): string;
+    public function renderTableOfContentsMenu(OpenApi $open_api, TopicsCollection $topics): string;
 }

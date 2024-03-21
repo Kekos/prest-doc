@@ -7,5 +7,5 @@ use Kekos\PrestDoc\ApiEntities\TopicsCollection;
 
 interface Operations
 {
-    public function getOperations(OpenApi $open_api, TopicsCollection $topics): string;
+    public function renderOperations(OpenApi $open_api, TopicsCollection $topics): string;
 }

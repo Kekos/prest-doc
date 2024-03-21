@@ -34,8 +34,8 @@ final class HtmlWithLayoutStep implements BuildStep
 
         $output_filepath = $this->filesystem->getOutputPathFromInput(
             file: $current,
-            in_directory: $context->getInDirectory(),
-            out_directory: $context->getOutDirectory(),
+            in_directory: $context->in_directory,
+            out_directory: $context->out_directory,
             from_ext: 'html',
             to_ext: 'html',
         );
@@ -68,10 +68,10 @@ final class HtmlWithLayoutStep implements BuildStep
             return $this->cached_template;
         }
 
-        if (!is_file($context->getLayout())) {
-            throw FaultyContextException::forTemplate($context->getLayout());
+        if (!is_file($context->layout)) {
+            throw FaultyContextException::forTemplate($context->layout);
         }
 
-        return $this->cached_template = new PhpTemplate($context->getLayout());
+        return $this->cached_template = new PhpTemplate($context->layout);
     }
 }

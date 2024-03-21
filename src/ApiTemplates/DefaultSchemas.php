@@ -23,7 +23,7 @@ use const PHP_EOL;
 
 final class DefaultSchemas implements Contracts\Schemas
 {
-    public function getSchemas(OpenApi $open_api): string
+    public function renderSchemas(OpenApi $open_api): string
     {
         $markdown = <<<MD
 ## <span id="schemas">Schemas</span>

@@ -43,7 +43,7 @@ final class AssetsRepository
     {
         if ($path[0] === '/') {
             $filename = basename($path);
-            @copy($path, $context->getOutDirectory() . '/' . $filename);
+            @copy($path, $context->out_directory . '/' . $filename);
 
             return $filename;
         }

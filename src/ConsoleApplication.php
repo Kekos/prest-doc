@@ -4,7 +4,6 @@ namespace Kekos\PrestDoc;
 
 use Throwable;
 
-use function dirname;
 use function getcwd;
 use function printf;
 use function str_starts_with;
@@ -27,7 +26,9 @@ final class ConsoleApplication
         $arguments[3] = $this->makeAbsolutePath($arguments[3]);
 
         if (isset($arguments[4])) {
-            $arguments[4] = $this->makeAbsolutePath($arguments[4]);
+            $config = ConfigurationLoader::fromPath($this->makeAbsolutePath($arguments[4]));
+        } else {
+            $config = new Configuration();
         }
 
         $builder = new Builder();
@@ -35,7 +36,7 @@ final class ConsoleApplication
             in_directory: $arguments[1],
             out_directory: $arguments[2],
             layout: $arguments[3],
-            openapi_template_directory: $arguments[4] ?? dirname(__DIR__) . '/templates',
+            configuration: $config,
         );
 
         try {
@@ -62,7 +63,7 @@ final class ConsoleApplication
     {
         printf("PrestDoc version %s\n\n", self::VERSION);
         echo "Usage:\n\n";
-        echo "\tprest-doc <in_directory> <out_directory> <layout_file> [<templates_directory>]\n\n";
+        echo "\tprest-doc <in_directory> <out_directory> <layout_file> [<config_file>]\n\n";
 
         return 0;
     }

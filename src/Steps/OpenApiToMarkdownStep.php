@@ -5,13 +5,14 @@ namespace Kekos\PrestDoc\Steps;
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use Kekos\PrestDoc\ApiEntities\TaggedTopicsRepository;
-use Kekos\PrestDoc\ApiTemplates\DefaultAuthentication;
-use Kekos\PrestDoc\ApiTemplates\DefaultFrontMatter;
-use Kekos\PrestDoc\ApiTemplates\DefaultHeaders;
-use Kekos\PrestDoc\ApiTemplates\DefaultOperations;
-use Kekos\PrestDoc\ApiTemplates\DefaultSchemas;
-use Kekos\PrestDoc\ApiTemplates\DefaultTableOfContentsMenu;
-use Kekos\PrestDoc\ApiTemplates\DefaultWrapper;
+use Kekos\PrestDoc\ApiTemplateFactory;
+use Kekos\PrestDoc\ApiTemplates\Contracts\Authentication;
+use Kekos\PrestDoc\ApiTemplates\Contracts\FrontMatter;
+use Kekos\PrestDoc\ApiTemplates\Contracts\Headers;
+use Kekos\PrestDoc\ApiTemplates\Contracts\Operations;
+use Kekos\PrestDoc\ApiTemplates\Contracts\Schemas;
+use Kekos\PrestDoc\ApiTemplates\Contracts\TableOfContentsMenu;
+use Kekos\PrestDoc\ApiTemplates\Contracts\Wrapper;
 use Kekos\PrestDoc\BuildContext;
 use Kekos\PrestDoc\Filesystem;
 use SplFileInfo;
@@ -36,10 +37,12 @@ final class OpenApiToMarkdownStep implements BuildStep
             return;
         }
 
+        $template_factory = new ApiTemplateFactory($context);
+
         $output_filepath = $this->filesystem->getOutputPathFromInput(
             file: $current,
-            in_directory: $context->getInDirectory(),
-            out_directory: $context->getOutDirectory(),
+            in_directory: $context->in_directory,
+            out_directory: $context->out_directory,
             from_ext: 'json',
             to_ext: 'md',
         );
@@ -48,17 +51,17 @@ final class OpenApiToMarkdownStep implements BuildStep
         $topics = $this->generateTopicsMenu($open_api)->getTopics();
 
         $template_parts = [
-            (new DefaultAuthentication())->getAuthentication($open_api),
-            (new DefaultHeaders())->getHeaders($open_api),
-            (new DefaultOperations())->getOperations($open_api, $topics),
-            (new DefaultSchemas())->getSchemas($open_api),
+            $template_factory->get(Authentication::class)->renderAuthentication($open_api),
+            $template_factory->get(Headers::class)->renderHeaders($open_api),
+            $template_factory->get(Operations::class)->renderOperations($open_api, $topics),
+            $template_factory->get(Schemas::class)->renderSchemas($open_api),
         ];
 
         $content = implode(PHP_EOL, $template_parts);
 
-        $output = (new DefaultFrontMatter())->getFrontMatter($open_api) . PHP_EOL;
-        $output .= (new DefaultTableOfContentsMenu())->getTableOfContentsMenu($open_api, $topics) . PHP_EOL;
-        $output .= (new DefaultWrapper())->getWrapper($open_api, $content);
+        $output = $template_factory->get(FrontMatter::class)->renderFrontMatter($open_api) . PHP_EOL;
+        $output .= $template_factory->get(TableOfContentsMenu::class)->renderTableOfContentsMenu($open_api, $topics) . PHP_EOL;
+        $output .= $template_factory->get(Wrapper::class)->renderWrapper($open_api, $content);
 
         $this->filesystem->makeDirectory(dirname($output_filepath));
         $this->filesystem->putFileContents($output_filepath, $output);

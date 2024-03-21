@@ -14,7 +14,7 @@ use const PHP_EOL;
 
 final class DefaultTableOfContentsMenu implements TableOfContentsMenu
 {
-    public function getTableOfContentsMenu(OpenApi $open_api, TopicsCollection $topics): string
+    public function renderTableOfContentsMenu(OpenApi $open_api, TopicsCollection $topics): string
     {
         $markdown = <<<MD
 <div class="prest-doc-topics-menu">

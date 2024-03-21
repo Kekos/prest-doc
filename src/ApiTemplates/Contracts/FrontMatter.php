@@ -6,5 +6,5 @@ use cebe\openapi\spec\OpenApi;
 
 interface FrontMatter
 {
-    public function getFrontMatter(OpenApi $open_api): string;
+    public function renderFrontMatter(OpenApi $open_api): string;
 }
