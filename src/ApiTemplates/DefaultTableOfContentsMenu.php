@@ -32,7 +32,7 @@ MD;
         }
 
         foreach ($topics->groups as $topic_group) {
-            $markdown .= sprintf("* [%s](#topic_%s)\n", $topic_group->name, Utils::slugify($topic_group->name));
+            $markdown .= sprintf("* [%s](#%s)\n", $topic_group->name, $topic_group->url_fragment);
 
             foreach ($topic_group->topics as $path_item) {
                 foreach ($path_item->getOperations() as $operation) {

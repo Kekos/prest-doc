@@ -5,11 +5,13 @@ namespace Kekos\PrestDoc\ApiEntities;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 use Kekos\PrestDoc\Exceptions\TopicException;
+use Kekos\PrestDoc\Utils;
 
 use function array_keys;
 use function array_reduce;
 use function count;
 use function current;
+use function sprintf;
 
 final class TaggedTopicsRepository implements TopicsRepository
 {
@@ -49,7 +51,8 @@ final class TaggedTopicsRepository implements TopicsRepository
         $topics = [];
 
         foreach ($this->topics as $topic => $path_items) {
-            $topics[] = new TopicGroup($topic, $path_items);
+            $slug = sprintf('topic_%s', Utils::slugify($topic));
+            $topics[] = new TopicGroup($topic, $slug, $path_items);
         }
 
         return new TopicsCollection($topics);

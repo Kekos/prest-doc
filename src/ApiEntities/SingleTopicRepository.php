@@ -17,7 +17,7 @@ final class SingleTopicRepository implements TopicsRepository
     public function getTopics(): TopicsCollection
     {
         $topics = [
-            new TopicGroup('Operations', $this->paths),
+            new TopicGroup('Operations', 'operations', $this->paths),
         ];
 
         return new TopicsCollection($topics);

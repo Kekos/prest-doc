@@ -11,6 +11,7 @@ final class TopicGroup
      */
     public function __construct(
         public readonly string $name,
+        public readonly string $url_fragment,
         public readonly array $topics,
     ) {
     }
