@@ -3,7 +3,7 @@
 
 use Kekos\PrestDoc\ConsoleApplication;
 
-require __DIR__ . '/vendor/autoload.php';
+require $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
 
 $application = new ConsoleApplication();
 exit($application->run($argv));

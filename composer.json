@@ -34,5 +34,8 @@
     },
     "scripts": {
         "stan": "vendor/bin/phpstan analyze -l 9 src/"
-    }
+    },
+    "bin": [
+        "bin/prest-doc"
+    ]
 }
