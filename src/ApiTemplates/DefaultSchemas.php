@@ -14,6 +14,10 @@ final class DefaultSchemas implements Contracts\Schemas
 
     public function renderSchemas(OpenApi $open_api): string
     {
+        if (!$open_api->components?->schemas) {
+            return '';
+        }
+
         $markdown = <<<MD
 ## <span id="schemas">Schemas</span>
 

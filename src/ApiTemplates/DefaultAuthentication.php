@@ -3,7 +3,9 @@
 namespace Kekos\PrestDoc\ApiTemplates;
 
 use cebe\openapi\spec\OpenApi;
+use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\SecurityScheme;
+use Kekos\PrestDoc\Exceptions\ResolveException;
 
 use const PHP_EOL;
 
@@ -11,7 +13,7 @@ final class DefaultAuthentication implements Contracts\Authentication
 {
     public function renderAuthentication(OpenApi $open_api): string
     {
-        if (!$open_api->components->securitySchemes) {
+        if (!$open_api->components?->securitySchemes) {
             return '';
         }
 
@@ -21,6 +23,14 @@ final class DefaultAuthentication implements Contracts\Authentication
 MD;
 
         foreach ($open_api->components->securitySchemes as $security_name => $security_scheme) {
+            if ($security_scheme instanceof Reference) {
+                $security_scheme = $security_scheme->resolve();
+
+                if (!$security_scheme instanceof SecurityScheme) {
+                    throw new ResolveException('Could not resolve security scheme');
+                }
+            }
+
             $markdown .= $this->getAuthenticationScheme($security_name, $security_scheme);
         }
 
@@ -39,6 +49,7 @@ MD;
             'http' => 'HTTP authorization',
             'oauth2' => 'OAuth 2',
             'openIdConnect' => 'OpenId Connect',
+            default => 'unknown',
         };
 
         $markdown .= "\n\nType: *$security_scheme->in*\n\n";

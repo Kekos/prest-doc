@@ -57,12 +57,15 @@ final class ApiTemplateFactory
      * @param class-string<T> $class_name
      * @return T
      */
-    public function get(string $class_name): object
+    public function get(string $class_name)
     {
         if (!isset($this->instances[$class_name])) {
             throw ConfigurationException::forClassNotFound($class_name);
         }
 
-        return $this->instances[$class_name];
+        /** @var T $object */
+        $object = $this->instances[$class_name];
+
+        return $object;
     }
 }

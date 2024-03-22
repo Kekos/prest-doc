@@ -9,11 +9,13 @@ use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
 use Kekos\PrestDoc\ApiEntities\TemplateViewModels\OperationsViewModel;
 use Kekos\PrestDoc\ApiEntities\TemplateViewModels\TopicOperationViewModel;
+use Kekos\PrestDoc\Exceptions\ResolveException;
 use Kekos\PrestDoc\Utils;
 
 use function array_unique;
 use function basename;
 use function implode;
+use function is_scalar;
 use function json_encode;
 use function sprintf;
 use function str_replace;
@@ -58,7 +60,7 @@ Host: $operation_view_model->server_url
 MD;
 
             $producers = [];
-            foreach ($operation->responses as $response) {
+            foreach ($operation->responses ?? [] as $response) {
                 foreach ($response->content as $content_type => $content) {
                     $producers[] = $content_type;
                 }
@@ -83,7 +85,7 @@ MD;
                         $operation_defined_auth = true;
                     }
 
-                    $markdown .= sprintf("%s: %s\n", $parameter->name, $parameter->example);
+                    $markdown .= sprintf("%s: %s\n", $parameter->name, (is_scalar($parameter->example) ? $parameter->example : ''));
                 }
             }
 
@@ -131,6 +133,10 @@ MD;
             foreach ($operation->parameters as $parameter) {
                 if ($parameter instanceof Reference) {
                     $parameter = $parameter->resolve();
+
+                    if (!$parameter instanceof Parameter) {
+                        throw new ResolveException('The parameter could not be resolved');
+                    }
                 }
 
                 $type = ($parameter->schema->type ?? '');
@@ -192,6 +198,7 @@ MD;
 
                     if (!$ref_schema && $content->schema instanceof Schema) {
                         foreach ($content->schema->properties as $name => $property) {
+                            $property = Utils::resolveReference($property);
                             $required = ($property->required ? 'Yes' : 'No');
                             $description = '';
                             if ($property->description) {
@@ -235,10 +242,18 @@ MD;
                 foreach ($response->content as $content) {
                     $schema = $content->schema;
                     if ($schema instanceof Schema && $schema->type === 'array') {
+                        if (!$schema->items) {
+                            continue;
+                        }
+
                         $response_example = [
                             Utils::getSchemaExampleData(Utils::resolveSchemaProperties($schema->items)),
                         ];
                     } else {
+                        if (!$schema) {
+                            continue;
+                        }
+
                         $response_example = Utils::getSchemaExampleData(
                             Utils::resolveSchemaProperties($schema)
                         );
@@ -280,6 +295,10 @@ MD;
                         $name = basename($schema->getReference());
                         $ref_schema = $name;
                     } else {
+                        if (!$schema) {
+                            continue;
+                        }
+
                         $name = $schema->type;
                     }
 

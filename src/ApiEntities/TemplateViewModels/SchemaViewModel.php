@@ -4,17 +4,19 @@ namespace Kekos\PrestDoc\ApiEntities\TemplateViewModels;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use Kekos\PrestDoc\Exceptions\ResolveException;
 
 use function array_keys;
 use function array_map;
 use function basename;
 use function in_array;
+use function sprintf;
 
 final class SchemaViewModel
 {
     /**
      * @param array<string, Schema|Reference> $properties
-     * @return array<string, SchemaProperty>
+     * @return array<int, SchemaProperty>
      */
     public function getSchemaProperties(Schema $schema, array $properties): array
     {
@@ -39,7 +41,15 @@ final class SchemaViewModel
             $ref_schema = $type;
             /** @noinspection CallableParameterUseCaseInTypeContextInspection */
             $property = $property->resolve();
+
+            if (!$property instanceof Schema) {
+                throw new ResolveException(sprintf('Could not resolve schema property `%s`', $property_name));
+            }
         } else {
+            if (!$property) {
+                throw new ResolveException(sprintf('Could not resolve schema property `%s`', $property_name));
+            }
+
             $type = $property->type;
         }
 

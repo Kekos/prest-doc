@@ -9,10 +9,13 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\SecurityScheme;
 use cebe\openapi\spec\Server;
+use InvalidArgumentException;
 use Kekos\PrestDoc\ApiEntities\TopicGroup;
+use Kekos\PrestDoc\Exceptions\ResolveException;
 
 use function array_reduce;
 use function is_array;
+use function is_string;
 use function parse_url;
 use function sprintf;
 
@@ -22,6 +25,7 @@ final class OperationsViewModel
 {
     /**
      * @return TopicOperationViewModel[]
+     * @throws UnresolvableReferenceException
      */
     public function getOperations(OpenApi $open_api, TopicGroup $topic_group): array
     {
@@ -38,7 +42,7 @@ final class OperationsViewModel
                     $method,
                     $operation,
                     $auth_examples,
-                    $open_api->components->securitySchemes,
+                    $open_api->components?->securitySchemes ?? [],
                 );
             }
         }
@@ -54,7 +58,13 @@ final class OperationsViewModel
             'http://localhost',
         );
 
-        return parse_url($server_url, PHP_URL_HOST);
+        $url_host = parse_url($server_url, PHP_URL_HOST);
+
+        if (!is_string($url_host)) {
+            throw new InvalidArgumentException('Could not resolve server url');
+        }
+
+        return $url_host;
     }
 
     /**
@@ -68,7 +78,9 @@ final class OperationsViewModel
 
         $consumers = [];
         foreach ($operation->requestBody->content as $content_type => $content) {
-            $consumers[] = $content_type;
+            if (is_string($content_type)) {
+                $consumers[] = $content_type;
+            }
         }
 
         if (!$consumers) {
@@ -80,12 +92,25 @@ final class OperationsViewModel
 
     /**
      * @return array<string, string>
+     * @throws UnresolvableReferenceException
      */
     public function getAuthExamples(OpenApi $open_api): array
     {
+        if (!$open_api->components?->securitySchemes) {
+            return [];
+        }
+
         $examples = [];
 
         foreach ($open_api->components->securitySchemes as $security_scheme) {
+            if ($security_scheme instanceof Reference) {
+                $security_scheme = $security_scheme->resolve();
+
+                if (!$security_scheme instanceof SecurityScheme) {
+                    throw new ResolveException('Could not resolve security scheme');
+                }
+            }
+
             switch ($security_scheme->type) {
                 case 'apiKey':
                     if ($security_scheme->in === 'header') {
@@ -126,8 +151,18 @@ final class OperationsViewModel
             $all_of_required_security = [];
             // All schemes in this loop are "OR"
             foreach ($security_schemes as $security_name => $security_scheme) {
+                if (!is_string($security_name)) {
+                    continue;
+                }
+
                 if ($security_scheme instanceof Reference) {
                     $security_scheme = $security_scheme->resolve();
+
+                    if (!$security_scheme instanceof SecurityScheme) {
+                        throw new ResolveException(
+                            sprintf('Could not resolve security scheme for `%s`', $security_name)
+                        );
+                    }
                 }
 
                 // All schemes in this loop are "AND"

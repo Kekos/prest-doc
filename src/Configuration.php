@@ -5,7 +5,7 @@ namespace Kekos\PrestDoc;
 final class Configuration
 {
     /**
-     * @param array<class-string, class-string> $api_templates_class_map
+     * @param array<class-string, object> $api_templates_class_map
      * @param array<int, string> $exclude_paths
      */
     public function __construct(

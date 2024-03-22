@@ -23,11 +23,11 @@ final class DefaultTableOfContentsMenu implements TableOfContentsMenu
 
 MD;
 
-        if ($open_api->components->securitySchemes) {
+        if ($open_api->components?->securitySchemes) {
             $markdown .= "* [Authentication](#authentication)\n";
         }
 
-        if ($open_api->components->headers) {
+        if ($open_api->components?->headers) {
             $markdown .= "* [Headers](#headers)\n";
         }
 
@@ -45,7 +45,7 @@ MD;
 
         $markdown .= "* [Schemas](#schemas)\n";
 
-        foreach ($open_api->components->schemas as $schema_name => $schema) {
+        foreach ($open_api->components?->schemas ?? [] as $schema_name => $schema) {
             $schema_slug = Utils::slugify($schema_name);
 
             $markdown .= sprintf("\t* [%s](#schema_%s)\n", $schema_name, $schema_slug);

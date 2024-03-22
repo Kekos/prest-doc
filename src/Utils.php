@@ -6,11 +6,14 @@ use cebe\openapi\exceptions\UnresolvableReferenceException;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 
+use Kekos\PrestDoc\Exceptions\ResolveException;
 use stdClass;
 
 use function current;
+use function is_array;
 use function mb_strtolower;
 use function rawurlencode;
+use function sprintf;
 use function str_replace;
 
 final class Utils
@@ -26,6 +29,22 @@ final class Utils
         $str = str_replace([' ', '--'], '-', $str);
 
         return rawurlencode($str);
+    }
+
+    public static function resolveReference(Schema|Reference $schema): Schema
+    {
+        if ($schema instanceof Schema) {
+            return $schema;
+        }
+
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+        $schema = $schema->resolve();
+
+        if (!$schema instanceof Schema) {
+            throw new ResolveException('The resolved reference type is not supported.');
+        }
+
+        return $schema;
     }
 
     /**

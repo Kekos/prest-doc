@@ -27,11 +27,7 @@ final class DefaultSchema implements SchemaTemplate
 
     public function renderSchema(Schema|Reference $schema, string $schema_name): string
     {
-        if ($schema instanceof Reference) {
-            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-            $schema = $schema->resolve();
-        }
-
+        $schema = Utils::resolveReference($schema);
         $properties = Utils::resolveSchemaProperties($schema);
         $schema_slug = Utils::slugify($schema_name);
 
