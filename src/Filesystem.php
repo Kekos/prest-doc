@@ -24,13 +24,18 @@ use function unlink;
 
 final class Filesystem
 {
-    public function getRelativePath(SplFileInfo $file, string $directory): string
+    public function getRelativePath(SplFileInfo|string $file, string $directory): string
     {
-        if (!str_starts_with($file->getRealPath(), $directory)) {
-            return $file->getRealPath();
+        $file_real_path = $file;
+        if ($file instanceof SplFileInfo) {
+            $file_real_path = $file->getRealPath();
         }
 
-        return substr($file->getRealPath(), strlen($directory) + 1);
+        if (!str_starts_with($file_real_path, $directory)) {
+            return $file_real_path;
+        }
+
+        return substr($file_real_path, strlen($directory) + 1);
     }
 
     public function getOutputPathFromInput(
