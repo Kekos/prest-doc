@@ -12,8 +12,8 @@ use Kekos\PrestDoc\ApiEntities\TemplateViewModels\TopicOperationViewModel;
 use Kekos\PrestDoc\Exceptions\ResolveException;
 use Kekos\PrestDoc\Utils;
 
-use function array_unique;
 use function basename;
+use function current;
 use function implode;
 use function is_scalar;
 use function json_encode;
@@ -67,7 +67,7 @@ MD;
             }
 
             if ($producers) {
-                $markdown .= sprintf("Accept: %s\n", implode(',', array_unique($producers)));
+                $markdown .= sprintf("Accept: %s\n", current($producers));
             }
 
             if ($consumer) {
