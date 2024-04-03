@@ -62,11 +62,6 @@ final class MarkdownToHtmlStep implements BuildStep
 
         $this->assets->addCss(getStyleSheetPath('a11y-light'), $context);
 
-        $output = $this->convert(
-            filepath: $current->getRealPath(),
-            layout_path: $context->layout,
-        );
-
         $output_filepath = $this->filesystem->getOutputPathFromInput(
             file: $current,
             in_directory: $relative_dir,
@@ -75,18 +70,30 @@ final class MarkdownToHtmlStep implements BuildStep
             to_ext: 'html',
         );
 
+        $relative_in_file = $this->filesystem->getRelativePath($current, $relative_dir);
+        $relative_out_file = $this->filesystem->getRelativePath($output_filepath, $context->out_directory);
+
+        $output = $this->convert(
+            filepath: $current->getRealPath(),
+            layout_path: $context->layout,
+            relative_in_file: $relative_in_file,
+            relative_out_file: $relative_out_file,
+        );
+
         $this->filesystem->makeDirectory(dirname($output_filepath));
         $this->filesystem->putFileContents($output_filepath, $output);
 
         return true;
     }
 
-    private function convert(string $filepath, string $layout_path): string
+    private function convert(string $filepath, string $layout_path, string $relative_in_file, string $relative_out_file): string
     {
         $document = $this->converter->convert($this->filesystem->getFileContents($filepath));
         $data = [
             'assets' => $this->assets,
             'content' => $document->getContent(),
+            'in_file' => $relative_in_file,
+            'out_file' => $relative_out_file,
         ];
 
         if ($document instanceof RenderedContentWithFrontMatter) {

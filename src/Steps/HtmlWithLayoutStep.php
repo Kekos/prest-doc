@@ -48,6 +48,8 @@ final class HtmlWithLayoutStep implements BuildStep
         $output = $layout_template->render([
             'assets' => $this->assets,
             'front_matter' => $result->getFrontMatter(),
+            'in_file' => $this->filesystem->getRelativePath($current, $context->in_directory),
+            'out_file' => $this->filesystem->getRelativePath($output_filepath, $context->out_directory),
             'content' => $result->getContent(),
         ]);
 

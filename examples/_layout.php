@@ -4,6 +4,8 @@ use Kekos\PrestDoc\AssetsRepository;
 /**
  * @var AssetsRepository $assets
  * @var array|null $front_matter
+ * @var string $in_file
+ * @var string $out_file
  * @var string $content
  */
 ?>
