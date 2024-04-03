@@ -143,6 +143,10 @@ MD;
                 $required = ($parameter->required ? 'Yes' : 'No');
                 $description = ($parameter->description ?? '');
 
+                if ($parameter->schema->enum) {
+                    $type .= sprintf('<br>enum, one of `%s`', implode(', ', $parameter->schema->enum));
+                }
+
                 $parameters_md_table[] = <<<MD
 | `$parameter->name` | $parameter->in | $type | $required | $description |
 MD;
