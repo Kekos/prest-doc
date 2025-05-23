@@ -7,6 +7,7 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
+use cebe\openapi\spec\SecurityRequirements;
 use cebe\openapi\spec\SecurityScheme;
 use cebe\openapi\spec\Server;
 use InvalidArgumentException;
@@ -14,7 +15,6 @@ use Kekos\PrestDoc\ApiEntities\TopicGroup;
 use Kekos\PrestDoc\Exceptions\ResolveException;
 
 use function array_reduce;
-use function is_array;
 use function is_string;
 use function parse_url;
 use function sprintf;
@@ -141,13 +141,15 @@ final class OperationsViewModel
      */
     public function getRequiredAuth(Operation $operation, array $security_schemes): array
     {
-        if (!is_array($operation->security)) {
+        if (!isset($operation->security)) {
             return [];
         }
 
+        /** @var SecurityRequirements $operation_security */
+        $operation_security = $operation->security;
         $one_of_required_security = [];
 
-        foreach ($operation->security as $security_requirement) {
+        foreach ($operation_security->getRequirements() as $security_requirement) {
             $all_of_required_security = [];
             // All schemes in this loop are "OR"
             foreach ($security_schemes as $security_name => $security_scheme) {
