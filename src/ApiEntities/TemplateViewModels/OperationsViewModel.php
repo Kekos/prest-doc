@@ -25,12 +25,10 @@ final class OperationsViewModel
 {
     /**
      * @return TopicOperationViewModel[]
-     * @throws UnresolvableReferenceException
      */
     public function getOperations(OpenApi $open_api, TopicGroup $topic_group): array
     {
         $server_url = $this->getServerUrl($open_api);
-        $auth_examples = $this->getAuthExamples($open_api);
 
         $operation_models = [];
 
@@ -41,7 +39,6 @@ final class OperationsViewModel
                     $path,
                     $method,
                     $operation,
-                    $auth_examples,
                     $open_api->components?->securitySchemes ?? [],
                 );
             }
@@ -94,15 +91,24 @@ final class OperationsViewModel
      * @return array<string, string>
      * @throws UnresolvableReferenceException
      */
-    public function getAuthExamples(OpenApi $open_api): array
+    public function getAuthExamples(Operation $operation, array $security_schemes): array
     {
-        if (!$open_api->components?->securitySchemes) {
+        if (!$security_schemes) {
+            return [];
+        }
+
+        $one_of_required_security = $this->getRequiredAuth($operation, $security_schemes);
+        if (!$one_of_required_security) {
             return [];
         }
 
         $examples = [];
 
-        foreach ($open_api->components->securitySchemes as $security_scheme) {
+        foreach ($security_schemes as $name => $security_scheme) {
+            if (!isset($one_of_required_security[$name])) {
+                continue;
+            }
+
             if ($security_scheme instanceof Reference) {
                 $security_scheme = $security_scheme->resolve();
 

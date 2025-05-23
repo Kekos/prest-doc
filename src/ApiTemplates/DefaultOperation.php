@@ -12,6 +12,7 @@ use Kekos\PrestDoc\ApiEntities\TemplateViewModels\TopicOperationViewModel;
 use Kekos\PrestDoc\Exceptions\ResolveException;
 use Kekos\PrestDoc\Utils;
 
+use function array_key_last;
 use function basename;
 use function current;
 use function implode;
@@ -89,7 +90,7 @@ MD;
                 }
             }
 
-            foreach ($operation_view_model->auth_examples as $header => $example) {
+            foreach ($this->view_model->getAuthExamples($operation, $operation_view_model->security_schemes) as $header => $example) {
                 if ($operation_defined_auth && strtolower($header) === 'authorization') {
                     continue;
                 }

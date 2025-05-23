@@ -9,7 +9,6 @@ use cebe\openapi\spec\SecurityScheme;
 final class TopicOperationViewModel
 {
     /**
-     * @param array<string, string> $auth_examples
      * @param Reference[]|SecurityScheme[] $security_schemes
      */
     public function __construct(
@@ -17,7 +16,6 @@ final class TopicOperationViewModel
         public readonly string $path,
         public readonly string $method,
         public readonly Operation $operation,
-        public readonly array $auth_examples,
         public readonly array $security_schemes,
     ) {
     }
