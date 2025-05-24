@@ -12,6 +12,7 @@ use function dirname;
 use function file_get_contents;
 use function file_put_contents;
 use function is_dir;
+use function is_string;
 use function ltrim;
 use function mkdir;
 use function rmdir;
@@ -29,6 +30,10 @@ final class Filesystem
         $file_real_path = $file;
         if ($file instanceof SplFileInfo) {
             $file_real_path = $file->getRealPath();
+        }
+
+        if (!is_string($file_real_path)) {
+            throw FilesystemException::forMethod('getRelativePath', $directory);
         }
 
         if (!str_starts_with($file_real_path, $directory)) {
