@@ -1,7 +1,7 @@
 {
     "name": "kekos/prest-doc",
     "description": "Static Site Generator for OpenAPI documentation",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "keywords": [
         "openapi",
