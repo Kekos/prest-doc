@@ -5,15 +5,11 @@ namespace Kekos\PrestDoc;
 use cebe\openapi\exceptions\UnresolvableReferenceException;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-
 use Kekos\PrestDoc\Exceptions\ResolveException;
-use stdClass;
 
 use function current;
-use function is_array;
 use function mb_strtolower;
 use function rawurlencode;
-use function sprintf;
 use function str_replace;
 
 final class Utils
@@ -102,28 +98,37 @@ final class Utils
                 continue;
             }
 
-            if ($property->example !== null) {
-                $value = $property->example;
-            } elseif ($property->default !== null) {
-                $value = $property->default;
-            } elseif ($property->enum) {
-                $value = current($property->enum);
-            } elseif ($property->items && $property->type === 'array') {
-                $value = [self::getSchemaExampleData(self::resolveSchemaProperties($property->items), $include_readonly)];
-            } else {
-                $value = match ($property->type) {
-                    'null' => null,
-                    'boolean' => true,
-                    'object' => self::getSchemaExampleData(self::resolveSchemaProperties($property), $include_readonly),
-                    'array' => [],
-                    'number' => 1,
-                    default => 'string',
-                };
-            }
-
-            $json_properties[$name] = $value;
+            $json_properties[$name] = self::getPropertyExampleData($property);
         }
 
         return $json_properties;
+    }
+
+    public static function getPropertyExampleData(Schema $property, bool $include_readonly = true): mixed
+    {
+        if ($property->example !== null) {
+            return $property->example;
+        }
+
+        if ($property->default !== null) {
+            return $property->default;
+        }
+
+        if ($property->enum) {
+            return current($property->enum);
+        }
+
+        if ($property->items && $property->type === 'array') {
+            return [self::getSchemaExampleData(self::resolveSchemaProperties($property->items), $include_readonly)];
+        }
+
+        return match ($property->type) {
+            'null' => null,
+            'boolean' => true,
+            'object' => self::getSchemaExampleData(self::resolveSchemaProperties($property), $include_readonly),
+            'array' => [],
+            'number' => 1,
+            default => 'string',
+        };
     }
 }

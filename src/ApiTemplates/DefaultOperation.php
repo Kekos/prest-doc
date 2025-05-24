@@ -16,15 +16,11 @@ use function basename;
 use function current;
 use function implode;
 use function is_scalar;
-use function json_encode;
 use function sprintf;
 use function str_replace;
 use function strtolower;
 use function strtoupper;
 
-use const JSON_PRETTY_PRINT;
-use const JSON_THROW_ON_ERROR;
-use const JSON_UNESCAPED_SLASHES;
 use const PHP_EOL;
 
 final class DefaultOperation implements Contracts\OperationTemplate
@@ -102,18 +98,8 @@ MD;
             if (isset($operation->requestBody->content[$consumer])) {
                 $content = $operation->requestBody->content[$consumer];
 
-                if ($content->example) {
-                    $markdown .= sprintf("%s\n", $content->example);
-                } elseif ($content instanceof MediaType && $content->schema) {
-                    $include_readonly = ($operation_view_model->method === 'GET');
-
-                    $markdown .= json_encode(
-                            Utils::getSchemaExampleData(
-                                Utils::resolveSchemaProperties($content->schema), $include_readonly
-                            ),
-                            JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
-                        ) . PHP_EOL;
-                }
+                $example_renderer = new SchemaExampleMarkdown($content);
+                $markdown .= $example_renderer->renderSchemaExample($operation_view_model->method === 'GET');
             }
 
             $markdown .= "```\n";
@@ -244,36 +230,14 @@ MD;
 
             foreach ($operation->responses as $status => $response) {
                 foreach ($response->content as $content) {
-                    $schema = $content->schema;
-                    if ($schema instanceof Schema && $schema->type === 'array') {
-                        if (!$schema->items) {
-                            continue;
-                        }
-
-                        $response_example = [
-                            Utils::getSchemaExampleData(Utils::resolveSchemaProperties($schema->items)),
-                        ];
-                    } else {
-                        if (!$schema) {
-                            continue;
-                        }
-
-                        $response_example = Utils::getSchemaExampleData(
-                            Utils::resolveSchemaProperties($schema)
-                        );
-                    }
-
-                    $json_example = json_encode(
-                        $response_example,
-                        JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
-                    );
+                    $example_renderer = new SchemaExampleMarkdown($content);
+                    $json_example = $example_renderer->renderSchemaExample(true);
 
                     $markdown .= <<<MD
 $status response
 
 ```json
-$json_example
-```
+$json_example```
 
 MD;
                 }
