@@ -16,6 +16,7 @@ final class TopicOperationViewModel
         public readonly string $path,
         public readonly string $method,
         public readonly Operation $operation,
+        public readonly OperationSecurity $security_requirements,
         public readonly array $security_schemes,
     ) {
     }

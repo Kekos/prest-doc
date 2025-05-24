@@ -12,7 +12,6 @@ use Kekos\PrestDoc\ApiEntities\TemplateViewModels\TopicOperationViewModel;
 use Kekos\PrestDoc\Exceptions\ResolveException;
 use Kekos\PrestDoc\Utils;
 
-use function array_key_last;
 use function basename;
 use function current;
 use function implode;
@@ -90,7 +89,7 @@ MD;
                 }
             }
 
-            foreach ($this->view_model->getAuthExamples($operation, $operation_view_model->security_schemes) as $header => $example) {
+            foreach ($this->view_model->getAuthExamples($operation_view_model) as $header => $example) {
                 if ($operation_defined_auth && strtolower($header) === 'authorization') {
                     continue;
                 }
@@ -330,24 +329,28 @@ MD;
             $responses_md_table = implode(PHP_EOL, $responses_md_table);
             $security_md = '';
 
-            if ($one_of_required_security = $this->view_model->getRequiredAuth($operation, $operation_view_model->security_schemes)) {
+            $security_requirements = $operation_view_model->security_requirements;
+            if ($security_requirements->hasAny()) {
                 $security_md .= "**Authentication required**\n\n";
 
-                $first_or = true;
-                $last_one_of_key = array_key_last($one_of_required_security);
-                foreach ($one_of_required_security as $one_of_key => $all_of_schemes) {
-                    if (!$first_or && $last_one_of_key === $one_of_key) {
-                        $security_md .= "\n\n*...or...*\n\n";
-                    }
-
-                    foreach ($all_of_schemes as $security_name => $security_scheme) {
+                if ($security_requirements->requirements_local) {
+                    foreach ($security_requirements->requirements_local as $security_name => $security_scheme) {
                         $security_md .= sprintf(
                             "* <a href=\"#authentication_%s\">%s</a>\n", $security_name,
                             $security_scheme->name
                         );
                     }
 
-                    $first_or = false;
+                    if ($security_requirements->requirements_global) {
+                        $security_md .= "\n\n*...or...*\n\n";
+                    }
+                }
+
+                foreach ($security_requirements->requirements_global as $security_name => $security_scheme) {
+                    $security_md .= sprintf(
+                        "* <a href=\"#authentication_%s\">%s</a>\n", $security_name,
+                        $security_scheme->name
+                    );
                 }
             }
 

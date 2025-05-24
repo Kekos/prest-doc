@@ -7,6 +7,7 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
+use cebe\openapi\spec\SecurityRequirement;
 use cebe\openapi\spec\SecurityRequirements;
 use cebe\openapi\spec\SecurityScheme;
 use cebe\openapi\spec\Server;
@@ -25,6 +26,7 @@ final class OperationsViewModel
 {
     /**
      * @return TopicOperationViewModel[]
+     * @throws UnresolvableReferenceException
      */
     public function getOperations(OpenApi $open_api, TopicGroup $topic_group): array
     {
@@ -34,11 +36,14 @@ final class OperationsViewModel
 
         foreach ($topic_group->topics as $path => $path_item) {
             foreach ($path_item->getOperations() as $method => $operation) {
+                $security_requirements = $this->getApplicableOperationSecurity($open_api, $operation);
+
                 $operation_models[] = new TopicOperationViewModel(
                     $server_url,
                     $path,
                     $method,
                     $operation,
+                    $security_requirements,
                     $open_api->components?->securitySchemes ?? [],
                 );
             }
@@ -89,34 +94,18 @@ final class OperationsViewModel
 
     /**
      * @return array<string, string>
-     * @throws UnresolvableReferenceException
      */
-    public function getAuthExamples(Operation $operation, array $security_schemes): array
+    public function getAuthExamples(TopicOperationViewModel $operation_view_model): array
     {
-        if (!$security_schemes) {
+        if (!$operation_view_model->security_schemes) {
             return [];
         }
 
-        $one_of_required_security = $this->getRequiredAuth($operation, $security_schemes);
-        if (!$one_of_required_security) {
-            return [];
-        }
+        $security_requirements = $operation_view_model->security_requirements->all();
 
         $examples = [];
 
-        foreach ($security_schemes as $name => $security_scheme) {
-            if (!isset($one_of_required_security[$name])) {
-                continue;
-            }
-
-            if ($security_scheme instanceof Reference) {
-                $security_scheme = $security_scheme->resolve();
-
-                if (!$security_scheme instanceof SecurityScheme) {
-                    throw new ResolveException('Could not resolve security scheme');
-                }
-            }
-
+        foreach ($security_requirements as $security_scheme) {
             switch ($security_scheme->type) {
                 case 'apiKey':
                     if ($security_scheme->in === 'header') {
@@ -141,47 +130,68 @@ final class OperationsViewModel
     }
 
     /**
-     * @param Reference[]|SecurityScheme[] $security_schemes
-     * @return array<int, array<string, SecurityScheme>>
      * @throws UnresolvableReferenceException
      */
-    public function getRequiredAuth(Operation $operation, array $security_schemes): array
+    private function getApplicableOperationSecurity(OpenApi $open_api, Operation $operation): OperationSecurity
     {
-        if (!isset($operation->security)) {
-            return [];
+        $security_schemes = $open_api->components?->securitySchemes ?? [];
+        if (!$security_schemes) {
+            return new OperationSecurity([], []);
         }
 
-        /** @var SecurityRequirements $operation_security */
-        $operation_security = $operation->security;
-        $one_of_required_security = [];
+        $local_requirements = [];
+        $global_requirements = [];
 
-        foreach ($operation_security->getRequirements() as $security_requirement) {
-            $all_of_required_security = [];
-            // All schemes in this loop are "OR"
-            foreach ($security_schemes as $security_name => $security_scheme) {
-                if (!is_string($security_name)) {
-                    continue;
-                }
+        if (isset($operation->security)) {
+            /** @var SecurityRequirements $operation_security */
+            $operation_security = $operation->security;
 
-                if ($security_scheme instanceof Reference) {
-                    $security_scheme = $security_scheme->resolve();
+            $local_requirements = $this->resolveSecurityRequirementsToSchemes($security_schemes, $operation_security->getRequirements());
+        }
 
-                    if (!$security_scheme instanceof SecurityScheme) {
-                        throw new ResolveException(
-                            sprintf('Could not resolve security scheme for `%s`', $security_name)
-                        );
-                    }
-                }
+        if (isset($open_api->security)) {
+            /** @var SecurityRequirements $global_security */
+            $global_security = $open_api->security;
 
-                // All schemes in this loop are "AND"
-                if (isset($security_requirement->$security_name)) {
-                    $all_of_required_security[$security_name] = $security_scheme;
+            $global_requirements = $this->resolveSecurityRequirementsToSchemes($security_schemes, $global_security->getRequirements());
+        }
+
+        return new OperationSecurity($local_requirements, $global_requirements);
+    }
+
+    /**
+     * @param array<string, SecurityScheme|Reference> $security_schemes
+     * @param array<string, SecurityRequirement|string> $security_requirements
+     * @return array<string, SecurityScheme>
+     * @throws UnresolvableReferenceException
+     */
+    private function resolveSecurityRequirementsToSchemes(array $security_schemes, array $security_requirements): array
+    {
+        $resolved_schemes = [];
+        foreach ($security_requirements as $security_name => $requirement) {
+            if (!is_string($security_name)) {
+                continue;
+            }
+
+            if (!isset($security_schemes[$security_name])) {
+                continue;
+            }
+
+            $security_scheme = $security_schemes[$security_name];
+
+            if ($security_scheme instanceof Reference) {
+                $security_scheme = $security_scheme->resolve();
+
+                if (!$security_scheme instanceof SecurityScheme) {
+                    throw new ResolveException(
+                        sprintf('Could not resolve security scheme for `%s`', $security_name)
+                    );
                 }
             }
 
-            $one_of_required_security[] = $all_of_required_security;
+            $resolved_schemes[$security_name] = $security_scheme;
         }
 
-        return $one_of_required_security;
+        return $resolved_schemes;
     }
 }
