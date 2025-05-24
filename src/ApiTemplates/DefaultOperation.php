@@ -66,11 +66,8 @@ MD;
                 $markdown .= sprintf("Accept: %s\n", current($producers));
             }
 
-            if ($consumer) {
-                $markdown .= sprintf("Content-Type: %s\n", $consumer);
-            }
-
             $operation_defined_auth = false;
+            $operation_defined_content_type = false;
             foreach ($operation->parameters as $parameter) {
                 if ($parameter instanceof Reference) {
                     $parameter = $parameter->resolve();
@@ -81,8 +78,16 @@ MD;
                         $operation_defined_auth = true;
                     }
 
+                    if (strtolower($parameter->name) === 'content-type') {
+                        $operation_defined_content_type = true;
+                    }
+
                     $markdown .= sprintf("%s: %s\n", $parameter->name, (is_scalar($parameter->example) ? $parameter->example : ''));
                 }
+            }
+
+            if ($consumer && !$operation_defined_content_type) {
+                $markdown .= sprintf("Content-Type: %s\n", $consumer);
             }
 
             foreach ($this->view_model->getAuthExamples($operation_view_model) as $header => $example) {
