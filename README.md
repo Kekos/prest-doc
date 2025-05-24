@@ -5,7 +5,7 @@ Static Site Generator for OpenAPI documentation written in PHP.
 ## Install
 
 ```
-composer install kekos/prest-doc
+composer require kekos/prest-doc
 ```
 
 Requires at least PHP 8.1.
