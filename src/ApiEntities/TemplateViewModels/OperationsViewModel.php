@@ -18,9 +18,11 @@ use Kekos\PrestDoc\Exceptions\ResolveException;
 use function array_reduce;
 use function is_string;
 use function parse_url;
+use function rtrim;
 use function sprintf;
 
 use const PHP_URL_HOST;
+use const PHP_URL_PATH;
 
 final class OperationsViewModel
 {
@@ -52,7 +54,7 @@ final class OperationsViewModel
         return $operation_models;
     }
 
-    public function getServerUrl(OpenApi $open_api): string
+    public function getServerUrl(OpenApi $open_api): ServerUrlInfo
     {
         $server_url = array_reduce(
             $open_api->servers,
@@ -61,12 +63,17 @@ final class OperationsViewModel
         );
 
         $url_host = parse_url($server_url, PHP_URL_HOST);
+        $base_url = parse_url($server_url, PHP_URL_PATH);
 
         if (!is_string($url_host)) {
             throw new InvalidArgumentException('Could not resolve server url');
         }
 
-        return $url_host;
+        if (!is_string($base_url)) {
+            $base_url = '';
+        }
+
+        return new ServerUrlInfo($url_host, rtrim($base_url, '/'));
     }
 
     /**

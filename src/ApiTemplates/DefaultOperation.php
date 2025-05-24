@@ -39,7 +39,7 @@ final class DefaultOperation implements Contracts\OperationTemplate
         $markdown = <<<MD
 ### <a id="op_$operation_slug">$operation->summary</a>
 
-`$http_method_uppercase $operation_view_model->path`
+`$http_method_uppercase {$operation_view_model->server_url->base_path}$operation_view_model->path`
 
 <div class="prest-doc-code-sample">
 
@@ -50,8 +50,8 @@ MD;
         foreach ($this->view_model->getConsumers($operation) as $consumer) {
             $markdown .= <<<MD
 ```http
-$http_method_uppercase $operation_view_model->path HTTP/1.1
-Host: $operation_view_model->server_url
+$http_method_uppercase {$operation_view_model->server_url->base_path}$operation_view_model->path HTTP/1.1
+Host: {$operation_view_model->server_url->host}
 
 MD;
 

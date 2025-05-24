@@ -12,7 +12,7 @@ final class TopicOperationViewModel
      * @param Reference[]|SecurityScheme[] $security_schemes
      */
     public function __construct(
-        public readonly string $server_url,
+        public readonly ServerUrlInfo $server_url,
         public readonly string $path,
         public readonly string $method,
         public readonly Operation $operation,
