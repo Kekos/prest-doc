@@ -130,12 +130,21 @@ MD;
                     }
                 }
 
-                $type = ($parameter->schema->type ?? '');
+                $parameter_schema = $parameter->schema;
+                if ($parameter_schema instanceof Reference) {
+                    $parameter_schema = $parameter_schema->resolve();
+
+                    if (!$parameter_schema instanceof Schema) {
+                        throw new ResolveException('The parameter schema could not be resolved');
+                    }
+                }
+
+                $type = ($parameter_schema->type ?? '');
                 $required = ($parameter->required ? 'Yes' : 'No');
                 $description = ($parameter->description ?? '');
 
-                if ($parameter->schema->enum) {
-                    $type .= sprintf('<br>enum, one of `%s`', implode(', ', $parameter->schema->enum));
+                if ($parameter_schema?->enum) {
+                    $type .= sprintf('<br>enum, one of `%s`', implode(', ', $parameter_schema->enum));
                 }
 
                 $parameters_md_table[] = <<<MD
