@@ -55,6 +55,21 @@ final class SchemaViewModel
 
         $required = ($schema->required && in_array($property_name, $schema->required, true));
 
+        if ($schema->allOf) {
+            foreach ($schema->allOf as $all_of_ref) {
+                if ($all_of_ref instanceof Reference) {
+                    $all_of_ref = $all_of_ref->resolve();
+                }
+
+                if ($all_of_ref instanceof Schema && isset($all_of_ref->properties[$property_name])) {
+                    $required = ($all_of_ref->required && in_array($property_name, $all_of_ref->required, true));
+                    if ($required) {
+                        break;
+                    }
+                }
+            }
+        }
+
         return new SchemaProperty(
             $property_name,
             $type,
