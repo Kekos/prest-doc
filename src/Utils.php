@@ -127,7 +127,8 @@ final class Utils
             'boolean' => true,
             'object' => self::getSchemaExampleData(self::resolveSchemaProperties($property), $include_readonly),
             'array' => [],
-            'number' => 1,
+            'integer' => 1,
+            'number' => 1.42,
             default => 'string',
         };
     }
