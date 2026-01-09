@@ -8,6 +8,7 @@ use cebe\openapi\spec\Schema;
 use Kekos\PrestDoc\Exceptions\ResolveException;
 
 use function current;
+use function is_scalar;
 use function mb_strtolower;
 use function rawurlencode;
 use function str_replace;
@@ -107,15 +108,15 @@ final class Utils
     public static function getPropertyExampleData(Schema $property, bool $include_readonly = true): mixed
     {
         if ($property->example !== null) {
-            return $property->example;
+            return self::getCastedPropertyExampleData($property, $property->example);
         }
 
         if ($property->default !== null) {
-            return $property->default;
+            return self::getCastedPropertyExampleData($property, $property->default);
         }
 
         if ($property->enum) {
-            return current($property->enum);
+            return self::getCastedPropertyExampleData($property, current($property->enum));
         }
 
         if ($property->items && $property->type === 'array') {
@@ -130,6 +131,19 @@ final class Utils
             'integer' => 1,
             'number' => 1.42,
             default => 'string',
+        };
+    }
+
+    public static function getCastedPropertyExampleData(Schema $property, mixed $example_data): mixed
+    {
+        if (!is_scalar($example_data)) {
+            return $example_data;
+        }
+
+        return match ($property->type) {
+            'integer' => (int) $example_data,
+            'number' => (float) $example_data,
+            default => $example_data,
         };
     }
 }
