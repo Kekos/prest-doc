@@ -48,7 +48,7 @@ final class DefaultSchema implements SchemaTemplate
 
             $restrictions = ($property->read_only ? 'read-only' : 'none');
             if ($property->enums) {
-                $restrictions .= sprintf('<br>enum, one of `%s`', implode(', ', $property->enums));
+                $restrictions .= sprintf('<br>enum, one of `%s`', implode('`, `', $property->enums));
             }
 
             $description = ($property->description ? str_replace("\n", '<br>', $property->description) : '');

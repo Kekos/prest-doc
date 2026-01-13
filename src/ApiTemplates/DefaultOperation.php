@@ -144,7 +144,7 @@ MD;
                 $description = ($parameter->description ?? '');
 
                 if ($parameter_schema?->enum) {
-                    $type .= sprintf('<br>enum, one of `%s`', implode(', ', $parameter_schema->enum));
+                    $type .= sprintf('<br>enum, one of `%s`', implode('`, `', $parameter_schema->enum));
                 }
 
                 $parameters_md_table[] = <<<MD
