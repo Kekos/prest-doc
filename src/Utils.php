@@ -85,6 +85,7 @@ final class Utils
     /**
      * @param array<string, Reference|Schema> $properties
      * @return array<string, mixed>
+     * @throws UnresolvableReferenceException
      */
     public static function getSchemaExampleData(array $properties, bool $include_readonly = true): array
     {
@@ -92,7 +93,11 @@ final class Utils
 
         foreach ($properties as $name => $property) {
             if ($property instanceof Reference) {
-                continue;
+                $property = $property->resolve();
+
+                if (!$property instanceof Schema) {
+                    continue;
+                }
             }
 
             if ($property->readOnly && !$include_readonly) {
