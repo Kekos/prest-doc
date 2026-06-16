@@ -23,6 +23,8 @@ use function strrpos;
 use function substr;
 use function unlink;
 
+use const DIRECTORY_SEPARATOR;
+
 final class Filesystem
 {
     public function getRelativePath(SplFileInfo|string $file, string $directory): string
@@ -57,12 +59,13 @@ final class Filesystem
         }
 
         if ($relative !== '') {
-            $relative .= '/';
+            $relative .= DIRECTORY_SEPARATOR;
         }
 
         return sprintf(
-            '%s/%s%s',
+            '%s%s%s%s',
             $out_directory,
+            DIRECTORY_SEPARATOR,
             $relative,
             $this->changeExtension($file->getFilename(), $from_ext, $to_ext),
         );

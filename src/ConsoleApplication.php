@@ -8,6 +8,8 @@ use function getcwd;
 use function printf;
 use function str_starts_with;
 
+use const DIRECTORY_SEPARATOR;
+
 final class ConsoleApplication
 {
     public const VERSION = '0.0.0';
@@ -52,11 +54,11 @@ final class ConsoleApplication
 
     private function makeAbsolutePath(string $path): string
     {
-        if (str_starts_with($path, '/')) {
+        if (str_starts_with($path, DIRECTORY_SEPARATOR)) {
             return $path;
         }
 
-        return getcwd() . '/' . $path;
+        return getcwd() . DIRECTORY_SEPARATOR . $path;
     }
 
     private function usage(): int
