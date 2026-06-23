@@ -128,6 +128,18 @@ final class Utils
             return [self::getSchemaExampleData(self::resolveSchemaProperties($property->items), $include_readonly)];
         }
 
+        if ($property->allOf) {
+            return self::getSchemaExampleData(self::resolveSchemaProperties($property->allOf[0]), $include_readonly);
+        }
+
+        if ($property->oneOf) {
+            return self::getSchemaExampleData(self::resolveSchemaProperties($property->oneOf[0]), $include_readonly);
+        }
+
+        if ($property->anyOf) {
+            return self::getSchemaExampleData(self::resolveSchemaProperties($property->anyOf[0]), $include_readonly);
+        }
+
         return match ($property->type) {
             'null' => null,
             'boolean' => true,

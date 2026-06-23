@@ -39,11 +39,17 @@ final class DefaultSchema implements SchemaTemplate
         $properties_md_table = [];
 
         foreach ($this->view_model->getSchemaProperties($schema, $properties) as $property) {
-            $type = ($property->type_is_array ? sprintf('Array of %s', $property->type) : $property->type);
-            if ($property->schema_reference) {
-                $type = sprintf('<a href="#schema_%s">%s</a>', Utils::slugify($property->schema_reference), $type);
+            $types = [];
+            foreach ($property->types as $property_type) {
+                $type = ($property->type_is_array ? sprintf('Array of %s', $property_type->type) : $property_type->type);
+                if ($property_type->schema_reference) {
+                    $type = sprintf('<a href="#schema_%s">%s</a>', Utils::slugify($property_type->schema_reference), $type);
+                }
+
+                $types[] = $type;
             }
 
+            $type = implode(', ', $types);
             $required = ($property->required ? 'Yes' : 'No');
 
             $restrictions = ($property->read_only ? 'read-only' : 'none');

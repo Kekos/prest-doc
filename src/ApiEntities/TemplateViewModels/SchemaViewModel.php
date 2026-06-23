@@ -70,15 +70,62 @@ final class SchemaViewModel
             }
         }
 
+        $is_composition = (
+            $property->allOf
+            || $property->oneOf
+            || $property->anyOf
+        );
+
+        $types = [];
+
+        if (!isset($ref_schema) && $is_composition) {
+            if ($property->oneOf) {
+                $types = $this->mergeCompositionType($property->oneOf, $types);
+            }
+
+            if ($property->allOf) {
+                $types = $this->mergeCompositionType($property->allOf, $types);
+            }
+
+            if ($property->anyOf) {
+                $types = $this->mergeCompositionType($property->anyOf, $types);
+            }
+        } else {
+            $types[] = new SchemaPropertyType($type, $ref_schema);
+        }
+
         return new SchemaProperty(
             $property_name,
-            $type,
-            $ref_schema,
+            $types,
             $is_array,
             $required,
             $property->readOnly,
             $property->enum,
             $property->description,
         );
+    }
+
+    /**
+     * @param list<Reference|Schema> $composition
+     * @param list<SchemaPropertyType> $types
+     * @return list<SchemaPropertyType>
+     */
+    private function mergeCompositionType(array $composition, array $types): array {
+        foreach ($composition as $schema) {
+            $types[] = $this->resolveSubtypeSchema($schema);
+        }
+
+        return $types;
+    }
+
+    private function resolveSubtypeSchema(Schema|Reference $schema): SchemaPropertyType
+    {
+        if ($schema instanceof Reference) {
+            $type = basename($schema->getReference());
+
+            return new SchemaPropertyType($type, $type);
+        }
+
+        return new SchemaPropertyType($schema->type);
     }
 }
