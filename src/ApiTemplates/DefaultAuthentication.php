@@ -52,7 +52,11 @@ MD;
             default => 'unknown',
         };
 
-        $markdown .= "\n\nType: *$security_scheme->in*\n\n";
+        $markdown .= "\n\n";
+
+        if ($security_scheme->in) {
+            $markdown .= "Type: *$security_scheme->in*\n\n";
+        }
 
         if ($security_scheme->scheme) {
             $markdown .= "Scheme: *$security_scheme->scheme*\n\n";
