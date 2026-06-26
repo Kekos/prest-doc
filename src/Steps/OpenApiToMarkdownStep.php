@@ -14,11 +14,14 @@ use Kekos\PrestDoc\ApiTemplates\Contracts\Schemas;
 use Kekos\PrestDoc\ApiTemplates\Contracts\TableOfContentsMenu;
 use Kekos\PrestDoc\ApiTemplates\Contracts\Wrapper;
 use Kekos\PrestDoc\BuildContext;
+use Kekos\PrestDoc\Exceptions\FilesystemException;
 use Kekos\PrestDoc\Filesystem;
 use SplFileInfo;
 
+use function copy;
 use function dirname;
 use function implode;
+use function sprintf;
 
 use const PHP_EOL;
 
@@ -65,6 +68,22 @@ final class OpenApiToMarkdownStep implements BuildStep
 
         $this->filesystem->makeDirectory(dirname($output_filepath));
         $this->filesystem->putFileContents($output_filepath, $output);
+
+        $openapi_copy_destination_path = $this->filesystem->getOutputPathFromInput(
+            file: $current,
+            in_directory: $context->in_directory,
+            out_directory: $context->out_directory,
+            from_ext: $current->getExtension(),
+            to_ext: $current->getExtension(),
+        );
+
+        $result = @copy($current->getRealPath(), $openapi_copy_destination_path);
+
+        if (!$result) {
+            throw new FilesystemException(
+                sprintf('Failed copy from "%s" to "%s"', $current->getRealPath(), $openapi_copy_destination_path)
+            );
+        }
     }
 
     public function processOutput(SplFileInfo $current, BuildContext $context): void
