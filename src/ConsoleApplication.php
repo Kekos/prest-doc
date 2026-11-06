@@ -5,6 +5,7 @@ namespace Kekos\PrestDoc;
 use Throwable;
 
 use function getcwd;
+use function max;
 use function printf;
 use function str_starts_with;
 
@@ -46,7 +47,7 @@ final class ConsoleApplication
         } catch (Throwable $ex) {
             $this->error($ex);
 
-            return $ex->getCode();
+            return max($ex->getCode(), 1);
         }
 
         return 0;
